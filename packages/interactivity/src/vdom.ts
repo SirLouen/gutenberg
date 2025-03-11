@@ -25,7 +25,8 @@ const isObject = ( item: unknown ): item is Record< string, unknown > =>
  * client and server processing. Invalid directive names (containing characters like
  * square brackets or colons) should be ignored by both client and server.
  * 
- * @see https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/interactivity-api/class-wp-interactivity-api.php
+ * @see https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/
+ *      interactivity-api/class-wp-interactivity-api.php
  */
 const directiveParser = new RegExp(
 	`^data-${ p }-` + // ${p} must be a prefix string, like 'wp'.

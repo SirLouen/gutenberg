@@ -43,7 +43,7 @@ class Tests_Blocks_Render_Rss extends WP_UnitTestCase {
 				'content-type' => 'application/rss+xml; charset=UTF-8',
 			),
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-			'body'     => file_get_contents( __DIR__ . '/../data/feed/feed-with-gmt-offset.xml' ),
+			'body'     => file_get_contents( GUTENBERG_DIR_TESTDATA . 'feed/feed-with-gmt-offset.xml' ),
 			'response' => array(
 				'code'    => 200,
 				'message' => 'OK',

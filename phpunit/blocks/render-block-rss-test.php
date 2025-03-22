@@ -26,8 +26,6 @@ class Tests_Blocks_Render_Rss extends WP_UnitTestCase {
 	/**
 	 * Mock HTTP request to return test feed data.
 	 *
-	 * @ticket 66970
-	 *
 	 * @param bool|array $response The existing response or false.
 	 * @param array      $args     The request arguments.
 	 * @param string     $url      The request URL.
@@ -56,8 +54,6 @@ class Tests_Blocks_Render_Rss extends WP_UnitTestCase {
 	/**
 	 * Sets up the "core/rss" block context for testing.
 	 * This is needed to avoid null access in WP_Block_Supports::apply_block_supports().
-	 *
-	 * @ticket 66970
 	 */
 	private function setup_block_context() {
 		$block = array(

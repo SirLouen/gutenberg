@@ -26,7 +26,7 @@ class Tests_Blocks_Render_Rss extends WP_UnitTestCase {
 	/**
 	 * Mock HTTP request to return test feed data.
 	 *
-	 * @ticket 62400
+	 * @ticket 66970
 	 *
 	 * @param bool|array $response The existing response or false.
 	 * @param array      $args     The request arguments.
@@ -57,7 +57,7 @@ class Tests_Blocks_Render_Rss extends WP_UnitTestCase {
 	 * Sets up the "core/rss" block context for testing.
 	 * This is needed to avoid null access in WP_Block_Supports::apply_block_supports().
 	 *
-	 * @ticket 62400
+	 * @ticket 66970
 	 */
 	private function setup_block_context() {
 		$block = array(
@@ -75,7 +75,7 @@ class Tests_Blocks_Render_Rss extends WP_UnitTestCase {
 	/**
 	 * Test that the date in the RSS feed is correctly rendered in the HTML.
 	 *
-	 * @ticket 62400
+	 * @ticket 66970
 	 *
 	 * @covers ::gutenberg_render_block_core_rss
 	 */

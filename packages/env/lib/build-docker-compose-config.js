@@ -186,6 +186,16 @@ module.exports = function buildDockerComposeConfig( config ) {
 			mysql: {
 				image: 'mariadb:lts',
 				ports: [ developmentMysqlPorts ],
+				healthcheck: {
+					test: [
+						'CMD',
+						'healthcheck.sh',
+						'--connect',
+						'--innodb_initialized',
+					],
+					timeout: '20s',
+					retries: 10,
+				},
 				environment: {
 					MYSQL_ROOT_HOST: '%',
 					MYSQL_ROOT_PASSWORD:
@@ -197,6 +207,16 @@ module.exports = function buildDockerComposeConfig( config ) {
 			'tests-mysql': {
 				image: 'mariadb:lts',
 				ports: [ testsMysqlPorts ],
+				healthcheck: {
+					test: [
+						'CMD',
+						'healthcheck.sh',
+						'--connect',
+						'--innodb_initialized',
+					],
+					timeout: '20s',
+					retries: 10,
+				},
 				environment: {
 					MYSQL_ROOT_HOST: '%',
 					MYSQL_ROOT_PASSWORD:
@@ -206,7 +226,11 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: [ 'mysql-test:/var/lib/mysql' ],
 			},
 			wordpress: {
-				depends_on: [ 'mysql' ],
+				depends_on: {
+					mysql: {
+						condition: 'service_healthy',
+					},
+				},
 				build: {
 					context: '.',
 					dockerfile: 'WordPress.Dockerfile',
@@ -224,7 +248,11 @@ module.exports = function buildDockerComposeConfig( config ) {
 				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			'tests-wordpress': {
-				depends_on: [ 'tests-mysql' ],
+				depends_on: {
+					'tests-mysql': {
+						condition: 'service_healthy',
+					},
+				},
 				build: {
 					context: '.',
 					dockerfile: 'Tests-WordPress.Dockerfile',

@@ -43,6 +43,7 @@ import CommentForm from './comment-form';
 import { focusCommentThread, getCommentExcerpt } from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
+import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -64,6 +65,7 @@ export function Comments( {
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
 	const [ blockRefs, setBlockRefs ] = useState( {} );
 
+	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
 	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
 		useSelect( ( select ) => {
 			const { getBlockAttributes, getSelectedBlockClientId } =
@@ -169,7 +171,7 @@ export function Comments( {
 			const offsets = {};
 
 			if ( ! isFloating ) {
-				return offsets;
+				return { offsets, minHeight: 0 };
 			}
 
 			// Find the index of the selected thread.
@@ -187,7 +189,7 @@ export function Comments( {
 				! selectedThreadData ||
 				! blockRefs[ selectedThreadData.id ]
 			) {
-				return offsets;
+				return { offsets, minHeight: 0 };
 			}
 
 			let blockElement = blockRefs[ selectedThreadData.id ];
@@ -274,13 +276,36 @@ export function Comments( {
 					threadTop: threadTop + additionalOffset,
 				};
 			}
-			return offsets;
+
+			let editorMinHeight = 0;
+			// Take the calculated top of the final note plus its height as the editor min height.
+			const lastThread = threads[ threads.length - 1 ];
+			if ( blockRefs[ lastThread.id ] ) {
+				const lastBlockElement = blockRefs[ lastThread.id ];
+				const lastBlockRect = lastBlockElement?.getBoundingClientRect();
+				const lastThreadTop = lastBlockRect?.top || 0;
+				const lastThreadHeight = heights[ lastThread.id ] || 0;
+				const lastThreadOffset = offsets[ lastThread.id ] || 0;
+				editorMinHeight =
+					lastThreadTop + lastThreadHeight + lastThreadOffset + 32;
+			}
+
+			return { offsets, minHeight: editorMinHeight };
 		};
-		const newOffsets = calculateAllOffsets();
+		const { offsets: newOffsets, minHeight } = calculateAllOffsets();
 		if ( Object.keys( newOffsets ).length > 0 ) {
 			setBoardOffsets( newOffsets );
 		}
-	}, [ heights, blockRefs, isFloating, threads, selectedThread ] );
+		// Ensure the editor has enough height to scroll to all notes.
+		setCanvasMinHeight( minHeight );
+	}, [
+		heights,
+		blockRefs,
+		isFloating,
+		threads,
+		selectedThread,
+		setCanvasMinHeight,
+	] );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads && ! isFloating ) {

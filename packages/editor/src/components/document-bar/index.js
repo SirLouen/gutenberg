@@ -66,6 +66,7 @@ export default function DocumentBar( props ) {
 		onNavigateToPreviousEntityRecord,
 		isTemplatePreview,
 		stylesCanvasTitle,
+		postSupports,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostType,
@@ -87,6 +88,7 @@ export default function DocumentBar( props ) {
 			_postType,
 			_postId
 		);
+		const _postTypeObject = getPostType( _postType );
 
 		const { default_template_types: templateTypes = [] } =
 			getCurrentTheme() ?? {};
@@ -95,7 +97,8 @@ export default function DocumentBar( props ) {
 			templateTypes,
 			template: _document,
 		} );
-		const _postTypeLabel = getPostType( _postType )?.labels?.singular_name;
+		const _postTypeLabel = _postTypeObject?.labels?.singular_name;
+		const _postSupports = _postTypeObject?.supports ?? null;
 
 		// Check if styles canvas is active and get its title
 		const { getStylesPath, getShowStylebook } = unlock(
@@ -126,6 +129,7 @@ export default function DocumentBar( props ) {
 				getEditorSettings().onNavigateToPreviousEntityRecord,
 			isTemplatePreview: getRenderingMode() === 'template-locked',
 			stylesCanvasTitle: _stylesCanvasTitle,
+			postSupports: _postSupports,
 		};
 	}, [] );
 
@@ -139,6 +143,11 @@ export default function DocumentBar( props ) {
 	const icon = props.icon;
 
 	const pageTypeBadge = usePageTypeBadge( postId );
+	const isTitleSupported = postSupports?.title === true;
+	let displayedTitle = __( '(no title supported)' );
+	if ( isTitleSupported ) {
+		displayedTitle = title ? stripHTML( title ) : __( 'No title' );
+	}
 
 	const mountedRef = useRef( false );
 	useEffect( () => {
@@ -215,9 +224,7 @@ export default function DocumentBar( props ) {
 						{ icon && <BlockIcon icon={ icon } /> }
 						<Text size="body" as="h1">
 							<span className="editor-document-bar__post-title">
-								{ title
-									? stripHTML( title )
-									: __( 'No title' ) }
+								{ displayedTitle }
 							</span>
 							{ pageTypeBadge && (
 								<span className="editor-document-bar__post-type-label">

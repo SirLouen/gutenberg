@@ -181,21 +181,18 @@ module.exports = function buildDockerComposeConfig( config ) {
 		config.env.tests.phpmyadminPort ?? ''
 	}}:80`;
 
+	const mysqlHealthcheck = {
+		test: [ 'CMD', 'healthcheck.sh', '--connect', '--innodb_initialized' ],
+		timeout: '10s',
+		retries: 10,
+	};
+
 	return {
 		services: {
 			mysql: {
 				image: 'mariadb:lts',
 				ports: [ developmentMysqlPorts ],
-				healthcheck: {
-					test: [
-						'CMD',
-						'healthcheck.sh',
-						'--connect',
-						'--innodb_initialized',
-					],
-					timeout: '20s',
-					retries: 10,
-				},
+				healthcheck: mysqlHealthcheck,
 				environment: {
 					MYSQL_ROOT_HOST: '%',
 					MYSQL_ROOT_PASSWORD:
@@ -207,16 +204,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 			'tests-mysql': {
 				image: 'mariadb:lts',
 				ports: [ testsMysqlPorts ],
-				healthcheck: {
-					test: [
-						'CMD',
-						'healthcheck.sh',
-						'--connect',
-						'--innodb_initialized',
-					],
-					timeout: '20s',
-					retries: 10,
-				},
+				healthcheck: mysqlHealthcheck,
 				environment: {
 					MYSQL_ROOT_HOST: '%',
 					MYSQL_ROOT_PASSWORD:

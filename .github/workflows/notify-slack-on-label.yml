@@ -11,13 +11,16 @@ jobs:
         if: ${{ github.event.label.name == 'Needs Testing' }}
         runs-on: ubuntu-latest
         permissions: {}
+        env:
+            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_NEEDS_TESTING_LABEL_ADDED_WEBHOOK_URL }}
         steps:
+            - name: Skip when webhook is unavailable
+              if: ${{ env.SLACK_WEBHOOK_URL == '' }}
+              run: echo "SLACK_NEEDS_TESTING_LABEL_ADDED_WEBHOOK_URL is not available; skipping notification."
+
             - name: Send custom HTTP request with testing data
+              if: ${{ env.SLACK_WEBHOOK_URL != '' }}
               run: |
-                  curl -X POST -H "Content-Type: application/json" -d '
-                  {
-                    "url": "${{ github.event_name == 'issues' && github.event.issue.html_url || github.event.pull_request.html_url }}",
-                    "type": "${{ github.event_name }}",
-                    "title": ${{ toJSON(github.event_name == 'issues' && github.event.issue.title || github.event.pull_request.title) }}
-                  }
-                  ' ${{ secrets.SLACK_NEEDS_TESTING_LABEL_ADDED_WEBHOOK_URL }}
+                  payload='{"url":"${{ github.event_name == 'issues' && github.event.issue.html_url || github.event.pull_request.html_url }}","type":"${{ github.event_name }}","title":${{ toJSON(github.event_name == 'issues' && github.event.issue.title || github.event.pull_request.title) }}}'
+
+                  curl -X POST -H "Content-Type: application/json" -d "$payload" "$SLACK_WEBHOOK_URL"

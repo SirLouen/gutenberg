@@ -20,7 +20,11 @@ jobs:
 
             - name: Send custom HTTP request with testing data
               if: ${{ env.SLACK_WEBHOOK_URL != '' }}
+              env:
+                  TARGET_URL: ${{ github.event_name == 'issues' && github.event.issue.html_url || github.event.pull_request.html_url }}
+                  TARGET_TYPE: ${{ github.event_name }}
+                  TARGET_TITLE: ${{ github.event_name == 'issues' && github.event.issue.title || github.event.pull_request.title }}
               run: |
-                  payload='{"url":"${{ github.event_name == 'issues' && github.event.issue.html_url || github.event.pull_request.html_url }}","type":"${{ github.event_name }}","title":${{ toJSON(github.event_name == 'issues' && github.event.issue.title || github.event.pull_request.title) }}}'
+                  payload=$(jq -n --arg url "$TARGET_URL" --arg type "$TARGET_TYPE" --arg title "$TARGET_TITLE" '{url:$url,type:$type,title:$title}')
 
                   curl -X POST -H "Content-Type: application/json" -d "$payload" "$SLACK_WEBHOOK_URL"

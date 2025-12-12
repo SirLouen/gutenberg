@@ -65,7 +65,7 @@ function gutenberg_get_font_face_styles() {
 				// Convert camelCase to kebab-case.
 				$converted_face = array();
 				foreach ( $font_face as $key => $value ) {
-					$kebab_case                  = _wp_to_kebab_case( $key );
+					$kebab_case                    = _wp_to_kebab_case( $key );
 					$converted_face[ $kebab_case ] = $value;
 				}
 

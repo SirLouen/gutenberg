@@ -69,7 +69,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		 * at a later phase (render cycle) so we only render the ones in use.
 		 * @see wp_add_global_styles_for_blocks
 		 */
-		$origins = array( 'default', 'theme', 'custom' );
+		$origins     = array( 'default', 'theme', 'custom' );
 		$styles_rest = $tree->get_stylesheet( $types, $origins );
 	}
 	$stylesheet = $styles_variables . $styles_rest;

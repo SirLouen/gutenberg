@@ -14,9 +14,17 @@ const debug = require( '../../debug' );
  */
 async function firstTimeContributorLabel( payload, octokit ) {
 	const userType = payload.pull_request.user.type;
+	const authorAssociation = payload.pull_request.author_association;
 
 	if ( userType === 'Bot' ) {
 		debug( 'first-time-contributor: User is a bot. Aborting' );
+		return;
+	}
+
+	if ( authorAssociation !== 'FIRST_TIME_CONTRIBUTOR' ) {
+		debug(
+			`first-time-contributor: Author association is ${ authorAssociation }. Aborting`
+		);
 		return;
 	}
 

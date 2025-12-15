@@ -21,7 +21,7 @@ async function firstTimeContributorLabel( payload, octokit ) {
 		return;
 	}
 
-	if ( authorAssociation !== 'FIRST_TIME_CONTRIBUTOR' ) {
+	if ( authorAssociation && authorAssociation !== 'FIRST_TIME_CONTRIBUTOR' ) {
 		debug(
 			`first-time-contributor: Author association is ${ authorAssociation }. Aborting`
 		);

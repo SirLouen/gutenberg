@@ -29,6 +29,7 @@ import {
 	useState,
 	useCallback,
 	createPortal,
+	useId,
 } from '@wordpress/element';
 import {
 	useReducedMotion,
@@ -103,6 +104,63 @@ const ArrowTriangle = () => (
 
 const slotNameContext = createContext< string | undefined >( undefined );
 slotNameContext.displayName = '__unstableSlotNameContext';
+
+/**
+ * Data attribute used to mark popover floating elements with their unique ID.
+ *
+ * @type {string}
+ */
+const POPOVER_ID_ATTR = 'data-popover-id';
+
+/**
+ * Data attribute used to mark popover floating elements with their parent's ID.
+ *
+ * @type {string}
+ */
+const PARENT_POPOVER_ID_ATTR = 'data-parent-popover-id';
+
+/*
+ * Context to track the parent popover's info for nested popover detection.
+ *
+ * @type {object}
+ * @property {string} id - The unique ID of the parent popover.
+ * @property {Element|null} floatingElement - The floating element of the parent popover.
+ */
+type ParentPopoverInfo = {
+	id: string;
+	floatingElement: Element | null;
+};
+
+const parentPopoverContext = createContext< ParentPopoverInfo | null >( null );
+parentPopoverContext.displayName = '__unstableParentPopoverContext';
+
+// Check if the blur target is inside a nested popover that is a descendant of
+// the given popover ID. This traverses the parent-popover chain via data attributes.
+const isBlurTargetInNestedPopover = (
+	blurTarget: Element,
+	popoverId: string
+): boolean => {
+	const closestPopover = blurTarget.closest( `[${ POPOVER_ID_ATTR }]` );
+	if ( ! closestPopover ) {
+		return false;
+	}
+
+	let current: Element | null = closestPopover;
+	while ( current ) {
+		const parentId = current.getAttribute( PARENT_POPOVER_ID_ATTR );
+		if ( parentId === popoverId ) {
+			return true;
+		}
+		if ( parentId ) {
+			current = document.querySelector(
+				`[${ POPOVER_ID_ATTR }="${ parentId }"]`
+			);
+		} else {
+			break;
+		}
+	}
+	return false;
+};
 
 const fallbackContainerClassname = 'components-popover__fallback-container';
 const getPopoverFallbackContainer = () => {
@@ -262,6 +320,12 @@ const UnforwardedPopover = (
 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
 	const slot = useSlot( slotName );
 
+	// Generate a unique ID for this popover (used for nested popover detection).
+	const popoverId = useId();
+
+	// Get the parent popover's info from context (for nested popover detection).
+	const parentPopoverInfo = useContext( parentPopoverContext );
+
 	let onDialogClose;
 
 	if ( onClose || onFocusOutside ) {
@@ -275,12 +339,24 @@ const UnforwardedPopover = (
 				const floatingElement = refs.floating.current;
 
 				// Check if blur is from this popover's reference element or its floating content
-				const isBlurFromThisPopover =
+				const isBlurFromDirectContent =
 					( referenceElement &&
 						'contains' in referenceElement &&
 						referenceElement.contains( blurTarget ) ) ||
 					floatingElement?.contains( blurTarget );
-				// Only proceed if the blur is actually from this popover
+
+				// Also check if blur is from a nested popover (rendered in a portal)
+				// This handles the case where nested popovers are siblings in the DOM
+				// but logically children of this popover.
+				const isBlurFromNestedPopover = isBlurTargetInNestedPopover(
+					blurTarget,
+					popoverId
+				);
+
+				const isBlurFromThisPopover =
+					isBlurFromDirectContent || isBlurFromNestedPopover;
+
+				// Only proceed if the blur is actually from this popover or its nested popovers
 				if ( ! isBlurFromThisPopover ) {
 					return;
 				}
@@ -427,6 +503,37 @@ const UnforwardedPopover = (
 	const isPositioned =
 		( ! shouldAnimate || animationFinished ) && x !== null && y !== null;
 
+	// Compute the parent popover ID to set as a data attribute.
+	// This is determined based on whether the reference element is inside
+	// the parent popover's floating element.
+	const parentId = useMemo( () => {
+		if ( ! parentPopoverInfo?.floatingElement ) {
+			return undefined;
+		}
+		const referenceElement = refs.reference.current;
+		if (
+			referenceElement &&
+			'nodeType' in referenceElement &&
+			parentPopoverInfo.floatingElement.contains(
+				referenceElement as Node
+			)
+		) {
+			return parentPopoverInfo.id;
+		}
+		return undefined;
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ parentPopoverInfo, refs.reference.current ] );
+
+	// Context value for nested popovers
+	const popoverContextValue = useMemo< ParentPopoverInfo >(
+		() => ( {
+			id: popoverId,
+			floatingElement: refs.floating.current,
+		} ),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[ popoverId, refs.floating.current ]
+	);
+
 	let content = (
 		<motion.div
 			className={ clsx( className, {
@@ -444,6 +551,8 @@ const UnforwardedPopover = (
 			ref={ mergedFloatingRef }
 			{ ...dialogProps }
 			tabIndex={ -1 }
+			{ ...{ [ POPOVER_ID_ATTR ]: popoverId } }
+			{ ...( parentId && { [ PARENT_POPOVER_ID_ATTR ]: parentId } ) }
 		>
 			{ /* Prevents scroll on the document */ }
 			{ isExpanded && <ScrollLock /> }
@@ -461,7 +570,11 @@ const UnforwardedPopover = (
 					/>
 				</div>
 			) }
-			<div className="components-popover__content">{ children }</div>
+			<div className="components-popover__content">
+				<parentPopoverContext.Provider value={ popoverContextValue }>
+					{ children }
+				</parentPopoverContext.Provider>
+			</div>
 			{ hasArrow && (
 				<div
 					ref={ arrowCallbackRef }

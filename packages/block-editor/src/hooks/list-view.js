@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { store as blocksStore, hasBlockSupport } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -13,20 +13,11 @@ import InspectorControls from '../components/inspector-controls';
 import { store as blockEditorStore } from '../store';
 import { privateApis } from '../private-apis';
 import { unlock } from '../lock-unlock';
+import { hasListViewSupport, LIST_VIEW_SUPPORT_KEY } from './list-view-support';
 
 const { PrivateListView } = unlock( privateApis );
 
-export const LIST_VIEW_SUPPORT_KEY = 'listView';
-
-/**
- * Check if the block has list view support.
- *
- * @param {string|Object} nameOrType Block name or block type object.
- * @return {boolean} Whether the block has list view support.
- */
-export function hasListViewSupport( nameOrType ) {
-	return hasBlockSupport( nameOrType, LIST_VIEW_SUPPORT_KEY );
-}
+export { hasListViewSupport, LIST_VIEW_SUPPORT_KEY };
 
 /**
  * Inspector controls panel for list view.

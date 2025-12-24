@@ -41,6 +41,7 @@
 -   `Notice`: Fix notice component spacing issue when actions are present. ([#69430](https://github.com/WordPress/gutenberg/pull/69430))
 -   `DatePicker`: Fix missing scheduled events and current date indicators. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
 -   `DatePicker`: Fix handling of `currentDate` when passed values as Date or timestamp. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
+-   `Popover`: Fix nested popover detection to properly trigger `onFocusOutside` when focus moves from a nested popover to an external element ([#74154](https://github.com/WordPress/gutenberg/pull/74154)).
 
 ### Internal
 

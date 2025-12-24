@@ -146,18 +146,20 @@ const isBlurTargetInNestedPopover = (
 	}
 
 	let current: Element | null = closestPopover;
+	const visited = new Set< string >();
+
 	while ( current ) {
 		const parentId = current.getAttribute( PARENT_POPOVER_ID_ATTR );
 		if ( parentId === popoverId ) {
 			return true;
 		}
-		if ( parentId ) {
-			current = document.querySelector(
-				`[${ POPOVER_ID_ATTR }="${ parentId }"]`
-			);
-		} else {
+		if ( ! parentId || visited.has( parentId ) ) {
 			break;
 		}
+		visited.add( parentId );
+		current = document.querySelector(
+			`[${ POPOVER_ID_ATTR }="${ parentId }"]`
+		);
 	}
 	return false;
 };

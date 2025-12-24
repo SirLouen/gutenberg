@@ -32,23 +32,6 @@ async function firstTimeContributorLabel( payload, octokit ) {
 	const owner = payload.repository.owner.login;
 	const author = payload.pull_request.user.login;
 
-	debug(
-		`first-time-contributor: Searching for commits in ${ owner }/${ repo } by @${ author }`
-	);
-
-	const { data: commits } = await octokit.rest.repos.listCommits( {
-		owner,
-		repo,
-		author,
-	} );
-
-	if ( commits.length > 0 ) {
-		debug(
-			`first-time-contributor-label: Not the first commit for author. Aborting`
-		);
-		return;
-	}
-
 	const pullRequestNumber = payload.pull_request.number;
 
 	debug(

@@ -21,6 +21,13 @@ export default function isURLLike( val ) {
 		return false;
 	}
 
+	// Underscores are not allowed in domain names (RFC 1035).
+	const hasUnderscores = val.includes( '_' );
+
+	if ( hasUnderscores ) {
+		return false;
+	}
+
 	const protocol = getProtocol( val );
 	const protocolIsValid = isValidProtocol( protocol );
 
@@ -44,13 +51,18 @@ function hasPossibleTLD( url, maxLength = 6 ) {
 	// Clean the URL by removing anything after the first occurrence of "?" or "#".
 	const cleanedURL = url.split( /[?#]/ )[ 0 ];
 
+	// Underscores are not allowed in domain names (RFC 1035).
+	if ( cleanedURL.includes( '_' ) ) {
+		return false;
+	}
+
 	// Regular expression explanation:
 	// - (?<=\S)                  : Positive lookbehind assertion to ensure there is at least one non-whitespace character before the TLD
 	// - \.                       : Matches a literal dot (.)
-	// - [a-zA-Z_]{2,maxLength}   : Matches 2 to maxLength letters or underscores, representing the TLD
+	// - [a-zA-Z]{2,maxLength}    : Matches 2 to maxLength letters, representing the TLD
 	// - (?:\/|$)                 : Non-capturing group that matches either a forward slash (/) or the end of the string
 	const regex = new RegExp(
-		`(?<=\\S)\\.(?:[a-zA-Z_]{2,${ maxLength }})(?:\\/|$)`
+		`(?<=\\S)\\.(?:[a-zA-Z]{2,${ maxLength }})(?:\\/|$)`
 	);
 
 	return regex.test( cleanedURL );

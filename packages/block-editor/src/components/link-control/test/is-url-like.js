@@ -51,12 +51,12 @@ describe( 'isURLLike', () => {
 		[ true, 'https://example.org/some/path' ],
 		[ true, 'ftp://example.org/some/path' ],
 		[ true, 'example.org/some/path' ],
-		[ true, 'example_test.tld' ],
-		[ true, 'example_test.com' ],
+		[ false, 'example_test.tld' ],
+		[ false, 'example_test.com' ],
 		[ false, 'example' ],
 		[ false, '.com' ],
-		[ true, '_test.com' ],
-		[ true, 'http://example_test.com' ],
+		[ false, '_test.com' ],
+		[ false, 'http://example_test.com' ],
 	] )(
 		'returns %s when testing against string "%s" for a valid TLD',
 		( expected, testString ) => {

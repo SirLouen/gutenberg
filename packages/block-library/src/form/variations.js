@@ -57,7 +57,7 @@ const variations = [
 		],
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
-			! blockAttributes?.type || blockAttributes?.type === 'text',
+			blockAttributes?.anchor === 'comment-form',
 	},
 	{
 		name: 'wp-privacy-form',
@@ -132,7 +132,7 @@ const variations = [
 		],
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
-			! blockAttributes?.type || blockAttributes?.type === 'text',
+			blockAttributes?.anchor === 'gdpr-form',
 	},
 ];
 

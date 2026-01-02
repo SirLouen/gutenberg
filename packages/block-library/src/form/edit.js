@@ -15,7 +15,12 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
+import {
+	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -56,8 +61,48 @@ const TEMPLATE = [
 	[ 'core/form-submit-button', {} ],
 ];
 
-const Edit = ( { attributes, setAttributes, clientId } ) => {
+const Edit = ( { attributes, setAttributes, clientId, name } ) => {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const previousAnchorRef = useRef( attributes.anchor );
+
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+
+	const { hasInnerBlocks, variations } = useSelect(
+		( select ) => {
+			const { getBlock } = select( blockEditorStore );
+			const { getBlockVariations } = select( blocksStore );
+			const block = getBlock( clientId );
+			return {
+				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+				variations: getBlockVariations( name, 'transform' ),
+			};
+		},
+		[ clientId, name ]
+	);
+
+	useEffect( () => {
+		const previousAnchor = previousAnchorRef.current;
+		const currentAnchor = attributes.anchor;
+
+		previousAnchorRef.current = currentAnchor;
+
+		if ( previousAnchor === currentAnchor || ! variations ) {
+			return;
+		}
+
+		const activeVariation = variations.find(
+			( variation ) => variation.attributes?.anchor === currentAnchor
+		);
+
+		if ( activeVariation?.innerBlocks ) {
+			replaceInnerBlocks(
+				clientId,
+				createBlocksFromInnerBlocksTemplate(
+					activeVariation.innerBlocks
+				)
+			);
+		}
+	}, [ attributes.anchor, clientId, replaceInnerBlocks, variations ] );
 
 	const resetAllSettings = () => {
 		setAttributes( {
@@ -70,17 +115,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 
 	const { action, method, email, submissionMethod } = attributes;
 	const blockProps = useBlockProps();
-
-	const { hasInnerBlocks } = useSelect(
-		( select ) => {
-			const { getBlock } = select( blockEditorStore );
-			const block = getBlock( clientId );
-			return {
-				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
-			};
-		},
-		[ clientId ]
-	);
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,

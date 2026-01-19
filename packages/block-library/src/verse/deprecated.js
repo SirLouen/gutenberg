@@ -154,12 +154,13 @@ const v3 = {
 		);
 	},
 	migrate: migrateTextAlign,
-	isEligible( attributes, innerBlocks, { block } ) {
-		// Only migrate blocks that have the v3 structure (with has-text-align-* class).
-		// Older v1/v2 blocks used different structures and should be handled by their own deprecations.
-		const hasTextAlignClass =
-			block?.originalContent?.includes( 'has-text-align-' );
-		return !! attributes.textAlign && hasTextAlignClass;
+	isEligible( attributes ) {
+		return (
+			!! attributes.textAlign ||
+			!! attributes.className?.match(
+				/\bhas-text-align-(left|center|right)\b/
+			)
+		);
 	},
 };
 

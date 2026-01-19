@@ -37,6 +37,7 @@ const v1 = {
 			/>
 		);
 	},
+	migrate: migrateTextAlign,
 };
 
 const v2 = {
@@ -80,9 +81,11 @@ const v2 = {
 			</pre>
 		);
 	},
-	migrate: migrateFontFamily,
-	isEligible( { style } ) {
-		return style?.typography?.fontFamily;
+	migrate( attributes ) {
+		return migrateTextAlign( migrateFontFamily( attributes ) );
+	},
+	isEligible( { style, textAlign } ) {
+		return style?.typography?.fontFamily || !! textAlign;
 	},
 };
 
@@ -151,13 +154,12 @@ const v3 = {
 		);
 	},
 	migrate: migrateTextAlign,
-	isEligible( attributes ) {
-		return (
-			!! attributes.textAlign ||
-			!! attributes.className?.match(
-				/\bhas-text-align-(left|center|right)\b/
-			)
-		);
+	isEligible( attributes, innerBlocks, { block } ) {
+		// Only migrate blocks that have the v3 structure (with has-text-align-* class).
+		// Older v1/v2 blocks used different structures and should be handled by their own deprecations.
+		const hasTextAlignClass =
+			block?.originalContent?.includes( 'has-text-align-' );
+		return !! attributes.textAlign && hasTextAlignClass;
 	},
 };
 

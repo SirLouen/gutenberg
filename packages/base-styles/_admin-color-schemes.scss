@@ -1,0 +1,93 @@
+/**
+ * Administration Color Scheme CSS Custom Properties
+ *
+ * Available properties:
+ * --wp-admin-color-base: The base/menu background color
+ * --wp-admin-color-text: The text color for menu items
+ * --wp-admin-color-icon: The icon color for menu items
+ * --wp-admin-color-highlight: The highlight/accent color
+ * --wp-admin-color-notification: The notification badge color
+ * --wp-admin-color-menu-submenu-background: The submenu background color
+ */
+
+// Default
+body {
+	--wp-admin-color-base: #1d2327;
+	--wp-admin-color-text: #fff;
+	--wp-admin-color-icon: #a7aaad;
+	--wp-admin-color-highlight: #2271b1;
+	--wp-admin-color-notification: #d63638;
+	--wp-admin-color-menu-submenu-background: #2c3338;
+}
+
+body.admin-color-light {
+	--wp-admin-color-base: #e5e5e5;
+	--wp-admin-color-text: #333;
+	--wp-admin-color-icon: #999;
+	--wp-admin-color-highlight: #04a4cc;
+	--wp-admin-color-notification: #d64e07;
+	--wp-admin-color-menu-submenu-background: #fff;
+}
+
+body.admin-color-modern {
+	--wp-admin-color-base: #1e1e1e;
+	--wp-admin-color-text: #fff;
+	--wp-admin-color-icon: #f3f1f1;
+	--wp-admin-color-highlight: #3858e9;
+	--wp-admin-color-notification: #3858e9;
+	--wp-admin-color-menu-submenu-background: #101517;
+}
+
+body.admin-color-blue {
+	--wp-admin-color-base: #52accc;
+	--wp-admin-color-text: #fff;
+	--wp-admin-color-icon: #e5f8ff;
+	--wp-admin-color-highlight: #096484;
+	--wp-admin-color-notification: #e1a948;
+	--wp-admin-color-menu-submenu-background: #4796b3;
+}
+
+body.admin-color-coffee {
+	--wp-admin-color-base: #59524c;
+	--wp-admin-color-text: #fff;
+	--wp-admin-color-icon: #f3f2f1;
+	--wp-admin-color-highlight: #c7a589;
+	--wp-admin-color-notification: #9ea476;
+	--wp-admin-color-menu-submenu-background: #46403b;
+}
+
+body.admin-color-ectoplasm {
+	--wp-admin-color-base: #523f6d;
+	--wp-admin-color-text: #fff;
+	--wp-admin-color-icon: #ece6f6;
+	--wp-admin-color-highlight: #a3b745;
+	--wp-admin-color-notification: #d46f15;
+	--wp-admin-color-menu-submenu-background: #413256;
+}
+
+body.admin-color-midnight {
+	--wp-admin-color-base: #363b3f;
+	--wp-admin-color-text: #fff;
+	--wp-admin-color-icon: #f1f2f3;
+	--wp-admin-color-highlight: #e14d43;
+	--wp-admin-color-notification: #69a8bb;
+	--wp-admin-color-menu-submenu-background: #26292c;
+}
+
+body.admin-color-ocean {
+	--wp-admin-color-base: #738e96;
+	--wp-admin-color-text: #fff;
+	--wp-admin-color-icon: #f2fcff;
+	--wp-admin-color-highlight: #9ebaa0;
+	--wp-admin-color-notification: #aa9d88;
+	--wp-admin-color-menu-submenu-background: #5e7d85;
+}
+
+body.admin-color-sunrise {
+	--wp-admin-color-base: #cf4944;
+	--wp-admin-color-text: #fff;
+	--wp-admin-color-icon: #f3f1f1;
+	--wp-admin-color-highlight: #dd823b;
+	--wp-admin-color-notification: #ccaf0b;
+	--wp-admin-color-menu-submenu-background: #be3631;
+}
